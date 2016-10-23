@@ -24,6 +24,7 @@ public class HTTPWebServer extends Thread {
 		this.server = server;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
 
@@ -68,6 +69,9 @@ public class HTTPWebServer extends Thread {
 				} else {
 					// This is interpreted as a file name
 					String fileName = httpQueryString.replaceFirst("/", "");
+					// Absolutely path of resource directory
+					String fileDetails = "resource";
+					fileName = fileDetails+"/"+fileName;
 					fileName = URLDecoder.decode(fileName);
 					if (new File(fileName).isFile()) {
 						sendResponse(200, fileName, true, outToClient);
@@ -152,8 +156,12 @@ public class HTTPWebServer extends Thread {
 	}
 
 	public static void main(String[] args) throws Exception {
-		 int portNumber = Integer.parseInt(args[0]);
-		//int portNumber = 8080;
+		int portNumber;
+		if(args.length>0){
+			portNumber = Integer.parseInt(args[0]);
+		}else{
+			portNumber = 8080;
+		}
 		serverSocket = new ServerSocket(portNumber);
 		System.out.println("Waiting for client on port "
 				+ serverSocket.getLocalPort() + "...");
