@@ -1,90 +1,76 @@
 package com.socket.http.client;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.URL;
+import java.net.UnknownHostException;
 
 public class HttpWebClient {
-	private static final String colon = ":";
-	private final static String USER_AGENT = "Mozilla/5.0";
-
 	public static void main(String[] args) throws Exception {
-		/* String serverName = args[0];
-	      int port = Integer.parseInt(args[1]);
-	      String fileName = args[2];*/
-		
-		 String serverName = "127.0.0.1";
-	      int port = 8080;
-	      String fileName = "index.html";
-	      String protocol = "http";
-	      String protocolDelim = "://";
 
-	      try {
-	         System.out.println("Connecting to " + serverName + " on port " + port);
-	         Socket client = new Socket(serverName, port);
-	         
-	        /* System.out.println("Just connected to " + client.getRemoteSocketAddress());
-	         
-	         DataOutputStream outToServer = new DataOutputStream(client.getOutputStream());
-	         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-	         String sentence = inFromServer.readLine();
-	         System.out.println(sentence);*/
-	         
-	         DataOutputStream dout=new DataOutputStream(client.getOutputStream());
-	         dout.writeBytes("GET /index.html HTTP/1.1");
-	         dout.writeBytes("Host: 127.0.0.1:8080");
-	         dout.writeBytes("Connection: keep-alive");
-	         dout.writeBytes("Cache-Control: max-age=0");
-	         dout.writeBytes("Upgrade-Insecure-Requests: 1");
-	         dout.writeBytes("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36	");
-	         dout.writeBytes("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-	         dout.writeBytes("Accept-Encoding: gzip, deflate, sdch");
-	         dout.writeBytes("Accept-Language: en-GB,en-US;q=0.8,en;q=0.6");
-	         dout.flush();  
-	         dout.close();  
-	         client.close();  
-	         
-	      }catch(IOException e) {
-	         e.printStackTrace();
-	      }
-	      //Programe to hit the application using HTTP Client
-//	      sendGet(protocol+protocolDelim+serverName+colon+port);
-	      System.out.println("DONE");
-	}
-	
-	private static void sendGet(String url) throws Exception {
-
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-		// optional default is GET
-		con.setRequestMethod("GET");
-
-		//add request header
-		con.setRequestProperty("User-Agent", USER_AGENT);
-
-		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
-
-		BufferedReader in = new BufferedReader(
-		        new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
+		String host = null;
+		Integer port = null;
+		String fileName = "";
+		if (args.length > 0) {
+			host = args[0];
 		}
-		in.close();
 
-		//print result
-		System.out.println(response.toString());
+		if (args.length > 1) {
+			try {
+				port = Integer.valueOf(args[1]);
+			} catch (NumberFormatException e) {
+				port = 8080;
+				fileName = args[1];
+			}
+		}
+
+		if (args.length > 2) {
+			fileName = args[2];
+		}
+		Socket s = new Socket();
+
+		PrintWriter s_out = null;
+		BufferedReader s_in = null;
+
+		try {
+			s.connect(new InetSocketAddress(host, port));
+			System.out.println("Connected");
+
+			// writer for socket
+			s_out = new PrintWriter(s.getOutputStream(), true);
+			// reader for socket
+			s_in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		}
+
+		// Host not found
+		catch (UnknownHostException e) {
+			System.err.println("Don't know about host : " + host);
+			System.exit(1);
+		}
+
+		long startTime = System.currentTimeMillis();
+		// Send message to server
+		String message = "GET /" + fileName + " HTTP/1.1\r\n\r\n";
+		s_out.println(message);
+
+		System.out.println("Message send");
+
+		// Get response from server
+		String response;
+		while ((response = s_in.readLine()) != null) {
+			System.out.println(response);
+		}
+
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		System.out
+				.println("Total elapsed http request/response time in milliseconds: "
+						+ elapsedTime);
+
+		s_out.close();
+		s_in.close();
+		s.close();
 
 	}
-
 }
