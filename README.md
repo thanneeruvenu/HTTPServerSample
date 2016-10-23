@@ -1,7 +1,7 @@
 # Socket_POC
 
 Start HttpServer -> 
-java HTTPWebServer <portNumber>
+java HTTPWebServer 8080
 
 open any browser and give HTTP GET request as shown below
 
