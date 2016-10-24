@@ -21,6 +21,7 @@ public class HttpWebClient {
 			try {
 				port = Integer.valueOf(args[1]);
 			} catch (NumberFormatException e) {
+				//set default port
 				port = 8080;
 				fileName = args[1];
 			}
@@ -68,6 +69,7 @@ public class HttpWebClient {
 				.println("Total elapsed http request/response time in milliseconds: "
 						+ elapsedTime);
 
+		
 		s_out.close();
 		s_in.close();
 		s.close();

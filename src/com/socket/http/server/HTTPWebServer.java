@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -96,10 +97,28 @@ public class HTTPWebServer extends Thread {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			// closing connection  and port
+			System.out.println("The Client " + server.getInetAddress() + ":"
+					+ server.getPort() + " is closed");		
+			try {
+				server.close();
+				//serverSocket.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 	}
 
+	/**
+	 * sending Response to out stream
+	 * 
+	 * @param statusCode
+	 * @param responseString
+	 * @param isFile
+	 * @param outToClient
+	 * @throws Exception
+	 */
 	public void sendResponse(int statusCode, String responseString,
 			boolean isFile, DataOutputStream outToClient) throws Exception {
 
@@ -144,6 +163,13 @@ public class HTTPWebServer extends Thread {
 		outToClient.close();
 	}
 
+	/**
+	 * sending file content to out stream
+	 * 
+	 * @param fin
+	 * @param out
+	 * @throws Exception
+	 */
 	public void sendFile(FileInputStream fin, DataOutputStream out)
 			throws Exception {
 		byte[] buffer = new byte[1024];
@@ -160,6 +186,7 @@ public class HTTPWebServer extends Thread {
 		if(args.length>0){
 			portNumber = Integer.parseInt(args[0]);
 		}else{
+			//default port
 			portNumber = 8080;
 		}
 		serverSocket = new ServerSocket(portNumber);

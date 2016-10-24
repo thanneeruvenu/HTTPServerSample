@@ -5,18 +5,10 @@ IDE : Eclipse
 
 Start HttpServer -> 
 
-compile :
----------
-javac com.socket.http.server.HTTPWebServer.java
+Note : we need to start server from IDE only
 
-RUN :
------
-java com.socket.http.server.HTTPWebServer 8080
-
-(OR)
-
-RUN in IDE :
-----------
+RUN in IDE Eclipse:
+------------------
 Right click of HTTPWebServer class and choose RUN configuration option and pass port number in arguments 
 
 Note: Port number is optional. if you don't pass then it will take by default 8080 port
